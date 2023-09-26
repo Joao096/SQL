@@ -1,0 +1,58 @@
+Abaixo iremos encontrar uma pequena analise sobre os dados de Repasse aos municipios de MG
+fonte: https://dados.mg.gov.br/dataset/transferencia-de-impostos-a-municipios
+
+--EXPLORANDO A TABELA TEMPO
+SELECT * 
+FROM Dm_Tempo_Mensal;
+--EXPLORANDO A TABELA REPASSE
+SELECT * 
+FROM Ft_Repasse_Mun;
+--EXPLORANDO A TABELA MUNICIPIO
+SELECT *
+FROM Dm_Municipio;
+
+--EXPLORANDO TODAS AS TABELAS JUNTAS
+SELECT * 
+FROM Dm_Municipio
+INNER JOIN Ft_Repasse_Mun ON Dm_Municipio.id_municipio = Ft_Repasse_Mun.id_municipio
+INNER JOIN Dm_Tempo_Mensal ON Ft_Repasse_Mun.id_tempo = Dm_Tempo_Mensal.id_tempo;
+
+--CONTANDO OS MUNCIPIOS DIFERENTES.
+SELECT count(DISTINCT(Dm_Municipio.nome))
+FROM Dm_Municipio;
+
+--O SCRIPT ABAIXO TRAZ INFORMAÇOES DOS VALORES ANUAIS E MENSAIS DE ICMS,IPI E IPVA REPASSADO AOS MUNICIPIOS DE MG
+SELECT Dm_Municipio.nome AS MUNICIPIO,
+Dm_Tempo_Mensal.mes AS MÊS,
+Dm_Tempo_Mensal.ano AS ANO,
+ROUND(Ft_Repasse_Mun.vr_icms) AS VALOR_ICMS,
+ROUND(Ft_Repasse_Mun.vr_ipi) AS VALOR_IPI,
+ROUND(Ft_Repasse_Mun.vr_ipva) AS VALOR_IPVA
+FROM Dm_Municipio
+INNER JOIN Ft_Repasse_Mun ON Dm_Municipio.id_municipio = Ft_Repasse_Mun.id_municipio
+INNER JOIN Dm_Tempo_Mensal ON Ft_Repasse_Mun.id_tempo = Dm_Tempo_Mensal.id_tempo
+ORDER BY NOME,ANO,MES;
+
+-- MÉDIA DOS IMPOSTOS RECEBIDOS POR ANULMENTE POR MUNICIPIOS
+SELECT nome,
+Dm_Tempo_Mensal.ANO,
+ROUND(AVG(Ft_Repasse_Mun.vr_icms)) as Média_ICMS,
+ROUND(AVG(Ft_Repasse_Mun.vr_ipi)) AS Média_IPI,
+ROUND(AVG(Ft_Repasse_Mun.vr_ipva)) AS Média_IPVA
+FROM Dm_Municipio
+INNER JOIN Ft_Repasse_Mun ON Dm_Municipio.id_municipio = Ft_Repasse_Mun.id_municipio
+INNER JOIN Dm_Tempo_Mensal ON Ft_Repasse_Mun.id_tempo = Dm_Tempo_Mensal.id_tempo
+GROUP by nome,Dm_Tempo_Mensal.ano;
+
+-- A SOMA DOS 3 IMPOSTOS MENSALMENTE
+SELECT Dm_Municipio.nome AS NOMES,
+Dm_Tempo_Mensal.ano,
+Dm_Tempo_Mensal.mes,
+ROUND(Ft_Repasse_Mun.vr_icms) AS ICMS,
+ROUND(Ft_Repasse_Mun.vr_ipi) AS IPI,
+ROUND(Ft_Repasse_Mun.vr_ipva) AS IPVA,
+ROUND(Ft_Repasse_Mun.vr_icms+Ft_Repasse_Mun.vr_ipi+Ft_Repasse_Mun.vr_ipva) AS SOMA_IMPOSTOS
+FROM Dm_Municipio
+INNER JOIN Ft_Repasse_Mun ON Dm_Municipio.id_municipio = Ft_Repasse_Mun.id_municipio
+INNER JOIN Dm_Tempo_Mensal ON Ft_Repasse_Mun.id_tempo = Dm_Tempo_Mensal.id_tempo
+ORDER BY NOME,ANO,MES;
