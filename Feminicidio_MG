@@ -1,0 +1,32 @@
+Neste projeto vocês irão encontrar analise de dados sobre feminicidios divulgados pela PCMG (Policia Civil de Minas Gerais).
+Fonte: https://dados.mg.gov.br/dataset/violencia-contra-mulher
+
+--EXPLORANDO OS DADOS.
+SELECT * FROM Feminicidio;
+
+--SOMANDO OS NUMERO DE VITIMAS MENSALMENTE.
+SELECT municipio_fato, ano,MES,SUM(qtde_vitimas) AS SOMA_VITIMAS
+FROM Feminicidio
+GROUP BY municipio_fato,MES
+ORDER BY municipio_fato,ano, MES;
+
+--SEPARANDO E SOMANDO AS VITIMAS DE TENTADO E CONSUMADO
+SELECT municipio_fato,MES,
+SUM(CASE WHEN tentado_consumado = 'CONSUMADO' THEN qtde_vitimas ELSE 0 END)AS CONSUMADO,
+SUM(CASE WHEN tentado_consumado = 'TENTADO' THEN qtde_vitimas ELSE 0 END) AS TENTADO
+FROM Feminicidio
+GROUP BY municipio_fato, MES;
+
+--AGRUPANDO POR REGIAO
+SELECT rmbh,
+SUM(CASE WHEN tentado_consumado = 'CONSUMADO' THEN qtde_vitimas ELSE 0 END) AS CONSUMADO,
+SUM(CASE WHEN tentado_consumado= 'TENTADO' THEN qtde_vitimas ELSE 0 END) AS TENTADO
+FROM Feminicidio
+GROUP by rmbh;
+
+--AGRUPANDO POR ANO
+SELECT ANO,
+SUM(CASE WHEN tentado_consumado = 'CONSUMADO' THEN qtde_vitimas ELSE 'TENTADO' END) AS CONSUMADO
+
+FROM Feminicidio
+GROUP BY ANO;
